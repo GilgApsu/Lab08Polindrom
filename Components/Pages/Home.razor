@@ -1,0 +1,32 @@
+@page "/"
+@inject IPalindromeService Service
+
+<PageTitle>Проверка палиндрома</PageTitle>
+
+<h1>Проверка на палиндром</h1>
+
+<input @bind="text" @bind:event="oninput" placeholder="Введите слово" />
+<button @onclick="CheckAsync">Проверить</button>
+
+@if (message is not null)
+{
+    <p>@message</p>
+}
+
+@code {
+    private string text = "";
+    private string? message;
+
+    private async Task CheckAsync()
+    {
+        if (Service.Normalize(text).Length == 0)
+        {
+            message = "Введите слово.";
+            return;
+        }
+
+        var word = await Service.CheckAndSaveAsync(text);
+        message = $"«{word.Text}» - " + (word.IsPalindrome ? "палиндром" : "не палиндром");
+        text = "";
+    }
+}

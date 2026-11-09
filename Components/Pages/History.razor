@@ -1,0 +1,43 @@
+@page "/history"
+@inject IPalindromeService Service
+
+<PageTitle>История</PageTitle>
+
+<h1>История проверок</h1>
+
+@if (items is null)
+{
+    <p>Загрузка...</p>
+}
+else if (items.Count == 0)
+{
+    <p>Записей нет.</p>
+}
+else
+{
+    <table border="1" cellpadding="4">
+        <tr><th>Слово</th><th>Результат</th><th>Дата</th><th></th></tr>
+        @foreach (var w in items)
+        {
+            <tr>
+                <td>@w.Text</td>
+                <td>@(w.IsPalindrome ? "палиндром" : "не палиндром")</td>
+                <td>@w.CheckedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                <td><button @onclick="() => DeleteAsync(w.Id)">Удалить</button></td>
+            </tr>
+        }
+    </table>
+}
+
+@code {
+    private List<CheckedWord>? items;
+
+    protected override async Task OnInitializedAsync() =>
+        items = await Service.GetAllAsync();
+
+    private async Task DeleteAsync(int id)
+    {
+        await Service.DeleteAsync(id);
+        items = await Service.GetAllAsync();
+    }
+}
